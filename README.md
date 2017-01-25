@@ -1,1 +1,3 @@
-I'm a README!
+#Peter Chou
+##110488356
+:thinking:
