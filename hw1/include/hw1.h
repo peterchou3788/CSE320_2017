@@ -20,6 +20,7 @@
 char validargs(int argc, char **argv, FILE **in, FILE **out);
 
 
+
 #define USAGE(retcode) do{                                                        \
 fprintf(stderr, "%s\n",                                                           \
 "usage: ./hw1 [-s | -t | -h]\n"                                                   \

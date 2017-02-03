@@ -9,6 +9,9 @@ char validargs(int argc, char** argv, FILE** in, FILE** out) {
 	if(argc < 2 || argc > 6)
 		USAGE(EXIT_FAILURE);
 
+	char mode = 0x00;
+	int AlphabetSize = lengthOfAlphabet();
+
 	char* h = "-h";
 	char* s = "-s";
 	char* t = "-t";
@@ -22,11 +25,17 @@ char validargs(int argc, char** argv, FILE** in, FILE** out) {
 
 		if(arg1 == s)
 		{
+			//*(ptr + 1) = 1;
+			mode = mode | 0x40;
 			if(arg2 == e || arg2 == d)
 			{
+				if(arg2 == d)
+					mode = mode | 0x20;
+					//*(ptr + 2) = 1;
 				*in = fopen(arg3,"r");
 				*out = fopen(arg4,"w");
-				USAGE(EXIT_SUCCESS);
+				mode += AlphabetSize;
+				return mode;
 			}
 		}
 
@@ -34,20 +43,42 @@ char validargs(int argc, char** argv, FILE** in, FILE** out) {
 		{
 			if(arg2 == e || arg2 == d)
 			{
+				if(arg2 == d)
+					mode = mode | 0x20;
 				*in = fopen(arg3,"r");
 				*out = fopen(arg4,"w");
-				USAGE(EXIT_SUCCESS);
+				mode += AlphabetSize;
+				return mode;
 			}
 		}
 
 		if(arg1 == h)
 		{
-			USAGE(EXIT_SUCCESS);
+			mode = 0x80;
+			USAGE(0);
+			return EXIT_SUCCESS;
 		}
 
 		else
+		{
+			if (mode == 0)
 			USAGE(EXIT_FAILURE);
 
+		}
+
+
+}
+
+int lengthOfAlphabet()
+{
+	int length=0;
+	char* alphabetPtr = Alphabet;
+	while (alphabetPtr != '\0')
+	{
+		length++;
+		alphabetPtr++;
+	}
+	return length;
 }
 
 
