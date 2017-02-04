@@ -8,6 +8,7 @@ typedef int boolean;
 
 int lengthOfAlphabet(char*);
 boolean strcomp(char* , char*);
+int uitoa(char*);
 
 
 char validargs(int argc, char** argv, FILE** in, FILE** out) {
@@ -17,7 +18,7 @@ char validargs(int argc, char** argv, FILE** in, FILE** out) {
 	if(argc < 2 || argc > 6)
 		USAGE(EXIT_FAILURE);
 
-	char mode = 0;
+	unsigned char mode = 0;
 	int n = 320;
 	int AlphabetSize = lengthOfAlphabet(Alphabet);
 
@@ -37,28 +38,36 @@ char validargs(int argc, char** argv, FILE** in, FILE** out) {
 		//printf("%s\n",arg2);
 
 
+		if(argc == 6)					//Check for n
+		{
+			n = uitoa(arg5);			//convert string into int
+		}
+		printf("%d\n",n);			//print value of n
+
+		int length = n%AlphabetSize;		//LSB 5 bits
+		printf("length : %d\n",length);
 
 		if(strcomp(arg1,"-s") == TRUE)		//check for s as first arg
 		{
-
-			if(strcomp(arg5,"") == TRUE)		//Check for n
-		{
-			char c = *(arg5);
-			n = c - '0';
-			printf("%d\n",n);
-		}
-		int length = n%AlphabetSize;
-		printf("length : %d\n",length);
-
-			mode = mode | 0x40;
+			mode = mode | length;			//setting last 5 LSB
+			mode = mode | 64;				//bit 1 for s
 			if(strcomp(arg2,"-e") || strcomp(arg2, "-d") == TRUE)
 			{
 				if(strcomp(arg2,"-d") == TRUE)
-					mode = mode | 0x20;
+					mode = mode | 32;
 
-				*in = fopen(arg3,"r");
-				*out = fopen(arg4,"w");
-				mode += (char)length;
+				if(strcomp(arg3,"-"))
+					*in = stdin;
+				else
+					*in = fopen(arg3,"r");
+
+				if(strcomp(arg4,"-"))
+					*out = stdout;
+				else
+					*out = fopen(arg4,"w");
+
+				printf("%d\n",mode);
+
 				return mode;
 			}
 		}
@@ -68,19 +77,31 @@ char validargs(int argc, char** argv, FILE** in, FILE** out) {
 		{
 			if(strcomp(arg2,"-e") || strcomp(arg2, "-d") == TRUE)
 			{
-					if(strcomp(arg2,"-d") == TRUE)
-					mode = mode | 0x20;
+				if(strcomp(arg2,"-d") == TRUE)
+					mode = mode | 32;
 
-				*in = fopen(arg3,"r");
-				*out = fopen(arg4,"w");
-				mode = mode | 0x01;
+				if(strcomp(arg3,"-"))
+					*in = stdin;
+				else
+					*in = fopen(arg3,"r");
+
+				if(strcomp(arg4,"-"))
+					*out = stdout;
+				else
+					*out = fopen(arg4,"w");
+
+				mode = mode | 1;
+				printf("%d\n",mode);
+
 				return mode;
 			}
 		}
 
 		if(strcomp(arg1,"-h")==TRUE)		//check for h as first arg
 		{
-			mode = 0x80;
+			mode = mode |128;
+			printf("%d\n",mode);
+			//printf("%c\n",mode);
 			USAGE(EXIT_SUCCESS);
 		}
 
@@ -91,7 +112,7 @@ char validargs(int argc, char** argv, FILE** in, FILE** out) {
 
 		}
 
-return mode;
+return (char)mode;
 }
 
 int lengthOfAlphabet(char *Alpha)
@@ -106,27 +127,6 @@ int lengthOfAlphabet(char *Alpha)
 	return length;
 }
 
-/*void createBooleansArgs(boolean* b,int argc)
-{
-	for(int i = 0; i < argc;i++)
-	{
-		*b = FALSE;
-		b++;
-	}
-}
-
-void fillBooleanArgs(boolean* b,int argc, char** argv)
-{
-	char* ptr = *argv;
-	for(int i = 0; i < argc;i++)
-	{
-		if (strcomp(ptr,"-h") == TRUE)
-		{
-
-		}
-
-	}
-}*/
 
 boolean strcomp(char* string1, char* string2)
 {
@@ -143,6 +143,28 @@ boolean strcomp(char* string1, char* string2)
 	else
 		return FALSE;
 
+}
+
+int uitoa(char* number)
+{
+	int base = 10;
+	int size = 0;
+	int num = 0;
+	char* ptr = number;
+
+	while(*(ptr) != '\0')
+	{
+		size++;
+		ptr++;
+	}
+
+	for(int i = 0;i<size;i++)
+	{
+		num *= base;
+		num += (int) (*(number) - '0');
+		number++;
+	}
+	return num;
 }
 
 
