@@ -75,6 +75,7 @@ char validargs(int argc, char** argv, FILE** in, FILE** out) {
 
 		if(strcomp(arg1,"-t")==TRUE)		//check for t as first arg
 		{
+			mode = mode | length;
 			if(strcomp(arg2,"-e") || strcomp(arg2, "-d") == TRUE)
 			{
 				if(strcomp(arg2,"-d") == TRUE)
@@ -90,7 +91,6 @@ char validargs(int argc, char** argv, FILE** in, FILE** out) {
 				else
 					*out = fopen(arg4,"w");
 
-				mode = mode | 1;
 				printf("%d\n",mode);
 
 				return mode;
@@ -105,14 +105,11 @@ char validargs(int argc, char** argv, FILE** in, FILE** out) {
 			USAGE(EXIT_SUCCESS);
 		}
 
-		else
-		{
-			if (mode == 0)					//if all else fails, return failure
-			USAGE(EXIT_FAILURE);
 
-		}
+			//if (mode == 0)					//if all else fails, return failure
+			//USAGE(EXIT_FAILURE);
 
-return (char)mode;
+return mode;
 }
 
 int lengthOfAlphabet(char *Alpha)
