@@ -6,7 +6,7 @@ typedef int boolean;
 // For your helper functions (you may add additional files also)
 // DO NOT define a main function here!
 
-int lengthOfAlphabet(char*);
+
 boolean strcomp(char* , char*);
 int uitoa(char*);
 
@@ -14,7 +14,7 @@ int uitoa(char*);
 char validargs(int argc, char** argv, FILE** in, FILE** out) {
 
 	/* code here */
-	printf("%d\n", argc);
+	//printf("%d\n", argc);
 	if(argc < 2 || argc > 6)
 		USAGE(EXIT_FAILURE);
 
@@ -22,7 +22,7 @@ char validargs(int argc, char** argv, FILE** in, FILE** out) {
 	int n = 320;
 	int AlphabetSize = lengthOfAlphabet(Alphabet);
 
-	printf("Size of Alphabet : %d\n", AlphabetSize);
+	//printf("Size of Alphabet : %d\n", AlphabetSize);
 
 
 		char* arg1 = *(argv + 1);		//First Arg (h,s,t)
@@ -32,7 +32,7 @@ char validargs(int argc, char** argv, FILE** in, FILE** out) {
 		char* arg5 = *(argv + 5);		//Value for n , No n => 320
 
 
-		printf("%s\n",arg1);
+		//printf("%s\n",arg1);
 		//printf("%c\n",arg5);
 		//printf("%s\n",(char*)0x40);
 		//printf("%s\n",arg2);
@@ -42,10 +42,10 @@ char validargs(int argc, char** argv, FILE** in, FILE** out) {
 		{
 			n = uitoa(arg5);			//convert string into int
 		}
-		printf("%d\n",n);			//print value of n
+		//printf("%d\n",n);			//print value of n
 
 		int length = n%AlphabetSize;		//LSB 5 bits
-		printf("length : %d\n",length);
+		//printf("length : %d\n",length);
 
 		if(strcomp(arg1,"-s") == TRUE)		//check for s as first arg
 		{
@@ -60,13 +60,18 @@ char validargs(int argc, char** argv, FILE** in, FILE** out) {
 					*in = stdin;
 				else
 					*in = fopen(arg3,"r");
+					if(*in == NULL)
+						USAGE(EXIT_FAILURE);
+
 
 				if(strcomp(arg4,"-"))
 					*out = stdout;
 				else
 					*out = fopen(arg4,"w");
+					if(*out == NULL)
+						freopen("cipher.txt","w",*out);
 
-				printf("%d\n",mode);
+				//printf("%d\n",mode);
 
 				return mode;
 			}
@@ -91,7 +96,7 @@ char validargs(int argc, char** argv, FILE** in, FILE** out) {
 				else
 					*out = fopen(arg4,"w");
 
-				printf("%d\n",mode);
+				//printf("%d\n",mode);
 
 				return mode;
 			}
@@ -100,7 +105,7 @@ char validargs(int argc, char** argv, FILE** in, FILE** out) {
 		if(strcomp(arg1,"-h")==TRUE)		//check for h as first arg
 		{
 			mode = mode |128;
-			printf("%d\n",mode);
+			//printf("%d\n",mode);
 			//printf("%c\n",mode);
 			USAGE(EXIT_SUCCESS);
 		}
@@ -163,6 +168,19 @@ int uitoa(char* number)
 	}
 	return num;
 }
+
+
+/*int encrypt(char mode)
+{
+	return 1;
+}
+
+int decrypt(char mode)
+{
+	return 1;
+}*/
+
+
 
 
 

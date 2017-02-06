@@ -18,6 +18,7 @@
  * @return Refer to homework document for the return value of this function.
  */
 char validargs(int argc, char **argv, FILE **in, FILE **out);
+int lengthOfAlphabet(char* Alpha);
 
 
 
