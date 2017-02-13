@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include "hw2.h"
+//#include "hw2.h"
 
 #define MAX_SIZE 256
 #define WORDLENGTH 50
