@@ -1,8 +1,9 @@
 #include "hw2.h"
 
 int main(int argc, char *argv[]){
-    DEFAULT_INPUT = stdin;
-    DEFAULT_OUTPUT = stdout;
+    FILE* DEFAULT_INPUT = stdin;
+    FILE* DEFAULT_OUTPUT = stdout;
+    char DEFAULT_DICT_FILE[]= "dictionary.txt";
     //create dictionary
     if((dict = (struct dictionary*) malloc(sizeof(struct dictionary))) == NULL)
     {

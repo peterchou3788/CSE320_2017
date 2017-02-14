@@ -1,3 +1,5 @@
+#ifndef HW2_H
+#define HW2_H
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,9 +23,9 @@
 } while (0);
 
 
-char DEFAULT_DICT_FILE[]= "dictionary.txt";
+/*char DEFAULT_DICT_FILE[]= "dictionary.txt";
 FILE* DEFAULT_INPUT = NULL;
-FILE* DEFAULT_OUTPUT = NULL;
+FILE* DEFAULT_OUTPUT = NULL;*/
 struct dictionary* dict;
 struct misspelled_word* m_list;
 
@@ -134,3 +136,5 @@ bool foundMisspelledMatch(char* inputWord);
  * @return     boolean
  */
 bool foundDictMatch(char* inputWord);
+
+#endif
