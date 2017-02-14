@@ -22,8 +22,8 @@
 
 
 char DEFAULT_DICT_FILE[]= "dictionary.txt";
-FILE* DEFAULT_INPUT= stdin;
-FILE* DEFAULT_OUTPUT= stdout;
+FILE* DEFAULT_INPUT = NULL;
+FILE* DEFAULT_OUTPUT = NULL;
 struct dictionary* dict;
 struct misspelled_word* m_list;
 
