@@ -1,0 +1,33 @@
+Test,Points,Out Of,Notes
+UnitTests,8,10,
+Usage,1,1,PASSED CASE
+Usage trailing args,1,1,PASSED CASE
+No args,1,1,PASSED CASE
+Garbage args,1,1,PASSED CASE
+Empty file,1,1,PASSED CASE
+Input file doesn't exist,1,1,PASSED CASE
+Outputting to file that exists,0,1,FAILED CASE: RETURN CODE
+Outputting to file that doesnt exist,0,1,FAILED CASE: RETURN CODE
+Sub encode simple,0,1,FAILED CASE: RETURN CODE
+Sub encode awesome_c,0,2,FAILED CASE: RETURN CODE
+Sub encode Sleepy Hollow,0,2,FAILED CASE: RETURN CODE
+Sub decode simple,0,1,FAILED CASE: RETURN CODE
+Sub decode awesome_c,0,2,FAILED CASE: RETURN CODE
+Sub decode Sleepy Hollow,0,2,FAILED CASE: RETURN CODE
+SQUA TEST encode bb,0,0.5,FAILED CASE: TIMEOUT
+SQUA TEST encode bB,0,0.5,FAILED CASE: TIMEOUT
+SQUA TEST encode Bb,0,0.5,FAILED CASE: TIMEOUT
+SQUA TEST encode BB,0,0.5,FAILED CASE: TIMEOUT
+SQUA TEST encode oo,0,0.5,FAILED CASE: TIMEOUT
+SQUA TEST encode oO,0,0.5,FAILED CASE: TIMEOUT
+SQUA TEST encode Oo,0,0.5,FAILED CASE: TIMEOUT
+SQUA TEST encode OO,0,0.5,FAILED CASE: TIMEOUT
+Tut encode simple,0,2,FAILED CASE: TIMEOUT
+Tut encode awesome_c,0,3,FAILED CASE: TIMEOUT
+Tut encode Sleepy Hollow,0,3,FAILED CASE: TIMEOUT
+Tut decode simple,0,2,FAILED CASE: DIFF
+Tut decode awesome_c,0,3,FAILED CASE: DIFF
+Tut decode Sleepy Hollow,0,3,FAILED CASE: DIFF
+simple INFO,0,1,FAILED CASE: RETURN CODE
+awesome_c INFO,0,1,FAILED CASE: RETURN CODE
+Total,14,50,
