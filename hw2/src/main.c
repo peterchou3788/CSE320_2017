@@ -3,7 +3,9 @@
 int main(int argc, char *argv[]){
     FILE* DEFAULT_INPUT = stdin;
     FILE* DEFAULT_OUTPUT = stdout;
-    char DEFAULT_DICT_FILE[]= "dictionary.txt";
+    char DEFAULT_DICT_FILE[]= "rsrc/dictionary.txt";
+    printf("%s\n",DEFAULT_DICT_FILE);
+
     //create dictionary
     if((dict = (struct dictionary*) malloc(sizeof(struct dictionary))) == NULL)
     {
@@ -96,7 +98,7 @@ int main(int argc, char *argv[]){
         char* character = line;
 
         fgets(line, MAX_SIZE+1, iFile);
-
+        printf("%s\n",line);
         //if there isn't a space or newline at the end of the line, put one there
         if((line[strlen(line)-1] != ' ') && (line[strlen(line)-1] != '\n'))
             strcat(line, " ");
@@ -114,6 +116,7 @@ int main(int argc, char *argv[]){
                 punct++;
                 printf("%d", strlen(wdPtr)-strlen(punct));
                 */
+
 
                 *wdPtr = '\0';
                 wdPtr = word;
