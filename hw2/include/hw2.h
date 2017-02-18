@@ -4,23 +4,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <debug.h>
+#include  <unistd.h>
+#include "mispelling.h"
+#include  <ctype.h>
+#include <libgen.h>
 //#include "hw2.h"
 
 #define MAX_SIZE 256
 #define WORDLENGTH 50
 #define MAX_MISSPELLED_WORDS 5
 
-#define USAGE(return_code) do { \
-    fprintf(stderr, "%s\n", \
-        "Usage: spell [-h] [-o OUT_FILE] [-i IN_FILE] [-d DICT_FILE] [-An]\n" \
-        "Spell Checker using a custom dictionary. Auto corrects any known misspellings in the text.\n"); \
-        "Additional function to add new words and randomized misspellings to the dictionary.\n\n" \
-        "\t-h\tDisplays this usage.\n" \
-        "\t-o\tOUT_FILE filename, if omitted output to stdout\n" \
-        "\t-i\tIN_FILE filename, if omitted input comes from stdin (CTRL+D to end input)\n" \
-        "\t-d\tfor the dictionary filename, if omitted use default 'rsrc/dictionary.txt'\n" \
-        "\t-An\tAutomatically add n (in range 0-5) random misspellings for any word not in the dictionary.\n" \
-} while (0);
+
 
 
 /*char DEFAULT_DICT_FILE[]= "dictionary.txt";
@@ -30,13 +25,16 @@ struct dictionary* dict;
 struct misspelled_word* m_list;
 
 struct Args{
+    bool h;
     bool d;
     bool i;
     bool o;
+    bool An;
 
     char dictFile[MAX_SIZE];
     char input[MAX_SIZE];
     char output[MAX_SIZE];
+    int n;
 };
 
 struct dictionary{
@@ -113,7 +111,7 @@ void printWords(struct dict_word* word, FILE* f);
  *
  * @param      inputWord  The input word
  */
-void processWord(char* inputWord);
+void processWord(char* inputWord, int num_misspellings);
 
 
 
@@ -136,5 +134,18 @@ bool foundMisspelledMatch(char* inputWord);
  * @return     boolean
  */
 bool foundDictMatch(char* inputWord);
+
+#define USAGE(return_code) do{                                                                                                   \
+    fprintf(stderr, "%s\n",                                                                             \
+        "Usage: spell [-h] [-o OUT_FILE] [-i IN_FILE] [-d DICT_FILE] [-An]\n"                           \
+        "Spell Checker using a custom dictionary. Auto corrects any known misspellings in the text.\n"  \
+        "Additional function to add new words and randomized misspellings to the dictionary.\n\n"       \
+        "\t-h\tDisplays this usage.\n"                                                                  \
+        "\t-o\tOUT_FILE filename, if omitted output to stdout\n"                                        \
+        "\t-i\tIN_FILE filename, if omitted input comes from stdin (CTRL+D to end input)\n"             \
+        "\t-d\tfor the dictionary filename, if omitted use default 'rsrc/dictionary.txt'\n"             \
+        "\t-An\tAutomatically add n (in range 0-5) random misspellings for any word not in the dictionary.\n"); \
+    exit(return_code);                                                                                   \
+}while(0)
 
 #endif
