@@ -7,19 +7,39 @@ int main(int argc, char *argv[])
     char DEFAULT_DICT_FILE[]= "rsrc/dictionary.txt";
      debug("%s\n",DEFAULT_DICT_FILE);
 
+   /*  struct dictionary Diction;
+     Diction.num_words = 0;
+     Diction.word_list = NULL;*/
+
     //create dictionary
     if((dict = (struct dictionary*) malloc(sizeof(struct dictionary))) == NULL)
     {
         printf("ERROR: OUT OF MEMORY.\n");
         return EXIT_FAILURE;
     }
-
+    //dict = &Diction;
     if((m_list = (struct misspelled_word*) malloc(sizeof(struct misspelled_word*))) == NULL)
     {
         printf("ERROR: OUT OF MEMORY.\n");
         return EXIT_FAILURE;
     }
-    m_list = NULL;
+   m_list = NULL;
+
+
+ if((dict->word_list = (struct dict_word*) malloc(sizeof(struct dict_word))) == NULL)
+    {
+        printf("ERROR: OUT OF MEMORY.\n");
+        return EXIT_FAILURE;
+    }
+
+
+    //m_list->misspelled = 0;
+    //m_list->correct_word = NULL;
+    //m_list->next = NULL;
+
+   // dict = NULL;
+    //dict->num_words = 0;
+    dict->word_list = NULL;
 
     struct Args args;
     // Set struct default values
@@ -209,33 +229,45 @@ int main(int argc, char *argv[])
     fwrite(line, strlen(line)+1, 1, oFile);
     printWords(dict->word_list , oFile);
     FILE* newDict = NULL;
+    //char filename[MAX_SIZE] = {0};
+    //sprintf(filename,"rsrc/new_dictionary.txt");
     if(args.An == true)
     {
 
-    char *base = basename(DEFAULT_DICT_FILE);       //take dictionary file name
+  //  char *base = basename(DEFAULT_DICT_FILE);       //take dictionary file name
 
     //char *prefix = dirname(DEFAULT_DICT_FILE);      //take the directory that leads to dictionary
-    char *prefix = "rsrc/new_";
+   // char *prefix = "rsrc/new_";
   //  *(prefix + strlen(prefix)) = '/';
     //char* newprefix = strcat(prefix,"/");    //cat them together
     //char* newprefix2 = strcat(prefix,"new_");
    // char* newbase = strcat("new_",base);
    // char *newDictname = strcat(newprefix,newbase);
-    newDict = fopen(strcat(prefix,base),"w");
+    newDict = fopen("rsrc/new_dictionary.txt","w");
     struct dict_word* wordlistptr = dict->word_list;
 
     while(wordlistptr != NULL)
     {
     char* Dword = dict->word_list->word;
-    fwrite(Dword,1,sizeof(Dword) ,newDict);
-    int numofmispellings = dict->word_list->num_misspellings;
+    fprintf(newDict,"%s",Dword);
+   // fwrite(Dword,1,sizeof(Dword) ,newDict);
+    int numofmispellings = (dict->word_list->num_misspellings);
     while(numofmispellings!= 0)
     {
-        char *mispelledword = dict->word_list->misspelled[numofmispellings]->word ;
-        fwrite(mispelledword,1,sizeof(mispelledword),newDict);
+        char *mispelledword = dict->word_list->misspelled[numofmispellings -1]->word ;
+        if(numofmispellings >1)
+        {
+        fprintf(newDict, "%s",mispelledword);
+        }
+        else
+        {
+        fprintf(newDict,"%s\n",mispelledword);
+        }
+       // fwrite(mispelledword,1,sizeof(,newDict);
         numofmispellings--;
     }
-    fwrite("\n",1,sizeof(char),newDict);
+    //fprintf(newDict,"%c",'\n');
+    //fwrite("\n",1,sizeof(char),newDict);
     wordlistptr = wordlistptr->next;
     }
     }
@@ -249,7 +281,7 @@ int main(int argc, char *argv[])
     //free m_list
     free(m_list);
 
-    fclose(newDict);
+   // fclose(newDict);
     fclose(dFile);
     fclose(iFile);
     fclose(oFile);

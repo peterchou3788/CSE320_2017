@@ -21,7 +21,7 @@ void processDictionary(FILE* f){
         char* wdPtr = word;
         char line[MAX_SIZE] = "\0";
         char* character = line;
-        //char word_list[MAX_MISSPELLED_WORDS+1][MAX_SIZE];
+        //dict->word_list[MAX_MISSPELLED_WORDS+1][MAX_SIZE];
         //removed word_list because unused
         int counter = 0;
         int firstWord = 1;
@@ -50,6 +50,7 @@ void processDictionary(FILE* f){
                 if(firstWord)
                 {
                     addWord(currWord, wdPtr);
+                    debug("%s\n",dict->word_list->word);
                     dict->num_words++;
 
                     firstWord = 0;
@@ -57,7 +58,7 @@ void processDictionary(FILE* f){
                 else
                 {
                     struct misspelled_word* currMisspelling = NULL;
-                    if((currMisspelling = malloc(sizeof(struct misspelled_word))) == NULL)
+                    if((currMisspelling = (struct misspelled_word*)malloc(sizeof(struct misspelled_word))) == NULL)
                     {
                         printf("ERROR: OUT OF MEMORY.");
                         return;
@@ -66,6 +67,7 @@ void processDictionary(FILE* f){
                     addMisspelledWord(currMisspelling, currWord, wdPtr);
                     wdPtr = word;
                     counter++;
+                    //free(currMisspelling);
                 }
             }
             //if the character isn't a space or a new line, add the character to word.
@@ -80,15 +82,27 @@ void processDictionary(FILE* f){
         }
 
     }
+  //  dict->word_list->next = NULL;
 }
 
 void addWord(struct dict_word* dWord, char* word){
     //setting up dWord fields
     dWord->misspelled_count = 0;
     dWord->num_misspellings = 0;
-    dWord->next = dict->word_list;
     strcpy(dWord->word, word);
-    dict->word_list = dWord;
+
+    if(dict->word_list == NULL)
+    {
+        dict->word_list = dWord;
+    }
+    else
+    {
+       dWord->next = dict->word_list;
+        dict->word_list = dWord;
+    }
+    //dWord->next = dict->word_list;
+    //dict->word_list = dWord;
+
 }
 
 void addMisspelledWord(struct misspelled_word* misspelledWord, struct dict_word* correctWord, char* word){
@@ -102,7 +116,8 @@ void addMisspelledWord(struct misspelled_word* misspelledWord, struct dict_word*
     }
     else                    //else update next pointer from previous mispelled
     {
-        m_list[((correctWord->num_misspellings)-1)].next = misspelledWord;
+
+        m_list[(correctWord->num_misspellings)-1].next = misspelledWord;
     }
     //misspelledWord->next = m_list +1;
     (correctWord->misspelled)[(correctWord->num_misspellings)] = misspelledWord;
@@ -113,7 +128,8 @@ void addMisspelledWord(struct misspelled_word* misspelledWord, struct dict_word*
 void freeWords(struct dict_word* currWord){
     if(currWord != NULL)
     {
-        freeWords(currWord);
+
+        freeWords(currWord->next);
 
         //deleted "int i;"
         //free word
@@ -226,13 +242,27 @@ void processWord(char* inputWord, int numofmispellings){
                         printf("ERROR: OUT OF MEMORY.");
                         return;
                     }
+                    /*if((newMWord->correct_word = (struct dict_word*) malloc(sizeof(struct dict_word))) == NULL)
+                    {
+                        printf("ERROR: OUT OF MEMORY.");
+                        return;
+                    }
+                    if((newMWord->next = (struct misspelled_word*) malloc(sizeof(struct misspelled_word))) == NULL)
+                    {
+                        printf("ERROR: OUT OF MEMORY.");
+                        return;
+                    }*/
                    // printf("Enter misspelling: ");
                     //scanf("%s", word);
                     addMisspelledWord(newMWord, newWord, wdPtr);
                     printf("Misspelling added\n");
                    // while ((ch = getchar()) != '\n' && ch != EOF);
                     numofmispellings--;
+                  /*  free(newMWord->next);
+                    free(newMWord->correct_word);
+                    free(newMWord);*/
                 }
+
             //}
         //}
     }
