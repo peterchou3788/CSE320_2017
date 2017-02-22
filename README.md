@@ -104,7 +104,7 @@ In this assignment the block header is defined as a single 64-bit quadword, simi
 > :thinking: The block size field is only 28 bits but technically it "uses" the 0s and 0a bits as part of the value. It just assumes these bits are always 0 because the address must be divisible by 16 (alignment for largest type in x86_64). This gives us an actual representation of 32 bits for the block size.
 > For example, if the requested is 13 bytes and the block size is 32 bytes the header will be set to: `001100000xxxxxxxxx0000000000110100000000000000000000000000100001`
 
-> :thinking: Another example, would be lets if the requested size is 32 bytes and we found a free block with a block size of 64 bytes. The requested size would be 32 bytes, splinter would be set to 1 byte, splinter size would be 16 bytes, and block size would be 64 bytes. Then the hex representation of the header would be as follows: `000010000xxxxxxxxx0000000010000000000000000000000000010000000101`
+> :thinking: Another example, would be lets if the requested size is 32 bytes and we found a free block with a block size of 64 bytes. The requested size would be 32 bytes, splinter would be set to 1 byte, splinter size would be 16 bytes, and block size would be 64 bytes. Then the hex representation of the header would be as follows: `000010000xxxxxxxxx0000000010000000000000000000000000000001000101`
 > Notice the header will always be at an address which is a mutiple of 8 (but not 16) due to payload alignment. This allows us to use the LSB (least significant bit) as a flag for the allocated state and the splinter state of the block.
 
 
