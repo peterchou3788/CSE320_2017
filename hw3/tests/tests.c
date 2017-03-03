@@ -23,7 +23,7 @@ Test(sf_memsuite, Free_block_check_header_footer_values, .init = sf_mem_init, .f
   pointer = (char*)pointer - 8;
   sf_header *sfHeader = (sf_header *) pointer;
   cr_assert(sfHeader->alloc == 0, "Alloc bit in header is not 0!\n");
-  sf_footer *sfFooter = (sf_footer *) ((char*)pointer - 8 + (sfHeader->block_size << 4));
+  sf_footer *sfFooter = (sf_footer *) ((char*)pointer + (sfHeader->block_size << 4) - 8);
   cr_assert(sfFooter->alloc == 0, "Alloc bit in the footer is not 0!\n");
 }
 
@@ -40,7 +40,7 @@ Test(sf_memsuite, SplinterSize_Check_char, .init = sf_mem_init, .fini = sf_mem_f
   cr_assert(sfHeader->splinter == 1, "Splinter bit in header is not 1!");
   cr_assert(sfHeader->splinter_size == 16, "Splinter size is not 16");
 
-  sf_footer *sfFooter = (sf_footer *)(sfHeader + (sfHeader->block_size << 4));
+  sf_footer *sfFooter = (sf_footer *)((char*)sfHeader + (sfHeader->block_size << 4) - 8);
   cr_assert(sfFooter->splinter == 1, "Splinter bit in header is not 1!");
 }
 
