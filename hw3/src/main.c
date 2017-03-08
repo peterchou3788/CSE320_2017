@@ -58,6 +58,12 @@ int main(int argc, char *argv[]) {
     info("Initialized heap with %dmb of heap space.\n", MAX_HEAP_SIZE >> 20);
     press_to_cont();
 
+   /* freelist_head = (sf_free_header*)sf_sbrk(4096);
+    void* currentAddress = sf_sbrk(0);
+    debug("%p\n", freelist_head);
+    debug("%p\n",currentAddress);
+    sf_snapshot(true);*/
+
     // Print out title for first test
     printf("=== Test1: Allocation test ===\n");
     // Test #1: Allocate an integer
