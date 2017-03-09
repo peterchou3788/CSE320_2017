@@ -86,6 +86,7 @@ int main(int argc, char *argv[]) {
     printf("=== Test3: Allocate a second variable ===\n");
     info("Attempting to assign value2 = %ld\n", VALUE2_VALUE);
     long *value2 = sf_malloc(sizeof(long));
+    sf_varprint(value2);
     null_check(value2, sizeof(long));
     payload_check(value2);
     // Assign a value
