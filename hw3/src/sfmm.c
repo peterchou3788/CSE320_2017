@@ -12,7 +12,7 @@
 #define QWSIZE 8		//Quadword = 64 bits = 8 bytes
 
 
-void coalesce(void* ptr);
+void* coalesce(void* ptr1,void* ptr2);
 sf_free_header* bestFit(sf_free_header* freelist_head,size_t requestedSize);
 void init(sf_free_header* freelist_head,size_t alloc);
 /**
@@ -22,8 +22,12 @@ void init(sf_free_header* freelist_head,size_t alloc);
  */
 sf_free_header* freelist_head = NULL;
 int pages = 0;
+int addPages = 0;
 size_t currAllocated = 0;
 size_t totalAllocated = 0;
+size_t blockSize = 0;
+size_t paddingSize = 0;
+size_t splinterSize = 0;
 
 void *sf_malloc(size_t size) {
 	//size_t newSize = 0;
@@ -39,15 +43,17 @@ void *sf_malloc(size_t size) {
 	//if(size <= QWSIZE)
 	//	newSize = 2*QWSIZE;
 	//else
-	debug("RequestedSize = %zu\n",size);
-	size_t blockSize = 16*((size + 16 + (16 -1)) / 16);						//make block size 16 addressable
-	debug("BlockSize = %zu\n",blockSize);
-	size_t paddingSize = blockSize - (16 + size);								//16 from header and footer
-	debug("PaddingSize = %zu\n",paddingSize);
+	if(freelist_head == NULL)               										//intialize head of freelist and create 1 page of mem
+	{
+		debug("RequestedSize = %zu\n",size);
+		blockSize = 16*((size + 16 + (16 -1)) / 16);						//make block size 16 addressable
+		debug("BlockSize = %zu\n",blockSize);
+		paddingSize = blockSize - (16 + size);								//16 from header and footer
+		debug("PaddingSize = %zu\n",paddingSize);
 
 		currAllocated += blockSize;
 		totalAllocated += blockSize;
-		int addPages = 0;
+
 		if(currAllocated >= 4096)
 		{
 			int pageAllocate = currAllocated/4096;
@@ -58,29 +64,12 @@ void *sf_malloc(size_t size) {
 
 		}
 
-		if(freelist_head == NULL)               										//intialize head of freelist and create 1 page of mem
-		{
-			addPages = blockSize/4096 + 1;
-			size_t alloc = addPages * 4096;
-        	freelist_head = (sf_free_header*)sf_sbrk(alloc);		//more than 1 page, allocate necessary amount
-        	freelist_head = freelist_head + 8;											//move brk to address divisble by 8 for header and payload divisible by 16
-        	debug("%p\n",freelist_head);
-        	init(freelist_head,alloc);
-
-        }
-       /* else if(freelist_head->next != NULL)
-        {
-        	if((ptrToFreeBlock = bestFit(freelist_head,blockSize)) == NULL)	//find bestfit position
-        	{
-        		sf_free_header* tempHeader = sf_sbrk(4096 * addPages);
-        		ptrToFreeBlock = bestFit(tempHeader,blockSize);
-        	}
-        }
-        else if(freelist_head->next == NULL && freelist_head->prev == NULL)	//no fragements; memory just allocated.
-        {
-        	freelist_head = sf_sbrk(4096 * addPages);
-        	ptrToFreeBlock = freelist_head;
-        }*/
+		addPages = blockSize/4096 + 1;
+		size_t alloc = addPages * 4096;
+        freelist_head = (sf_free_header*)sf_sbrk(alloc);		//more than 1 page, allocate necessary amount
+        freelist_head = freelist_head + 8;											//move brk to address divisble by 8 for header and payload divisible by 16
+        debug("%p\n",freelist_head);
+        init(freelist_head,alloc);
 
         pages += addPages;
 
@@ -113,7 +102,65 @@ void *sf_malloc(size_t size) {
         freelist_head->header.block_size = freeBlockSize >> 4;
         ftFreeList->block_size = freeBlockSize >>4 ;
 
-	return memptr;
+        return memptr;
+    }
+
+    else																//do best fit otherwise
+    {
+    	blockSize = 16*((size + 16 + (16 -1)) / 16);
+
+
+    	sf_free_header* freeBlockPtr = (sf_free_header*)bestFit(freelist_head,blockSize);	//search freelist for best fit address
+    	if(pages >4)
+    		return NULL;
+    	size_t freeBlockSize = freeBlockPtr->header.block_size;									//get block size of free block
+
+    	debug("RequestedSize = %zu\n",size);
+		blockSize = freeBlockSize;						//make block size 16 addressable
+		debug("BlockSize = %zu\n",blockSize);
+		int multiple = size / 16;						//return factor for multiple of 16
+		paddingSize = 16*(multiple+1) - size;
+		debug("PaddingSize = %zu\n",paddingSize);
+		splinterSize = blockSize - (size + paddingSize + 16);	//16 is from header and footer
+		debug("SplinterSize = %zu\n",splinterSize)
+
+
+    	sf_header* freeBlockHdr = (sf_header*)freeBlockPtr;
+    	void* freeBlockMem = ((char*)freeBlockHdr) + QWSIZE;
+    	sf_footer* freeBlockFtr = (sf_footer*)((char*)freeBlockHdr + freeBlockSize - QWSIZE);
+
+    	if(splinterSize < 32)
+    	{
+    		freeBlockHdr->splinter = 1;
+    		freeBlockHdr->splinter_size = splinterSize;
+    		freeBlockFtr->splinter = 1;
+    	}
+    	freeBlockHdr->alloc = 1;
+    	freeBlockHdr->block_size = freeBlockSize >>4;
+    	freeBlockHdr->padding_size = paddingSize;
+    	freeBlockHdr->requested_size = size;
+    	freeBlockFtr->alloc = 1;
+    	freeBlockFtr->block_size = freeBlockSize>>4;
+
+
+    	return freeBlockMem;
+    }
+
+
+       /* else if(freelist_head->next != NULL)
+        {
+        	if((ptrToFreeBlock = bestFit(freelist_head,blockSize)) == NULL)	//find bestfit position
+        	{
+        		sf_free_header* tempHeader = sf_sbrk(4096 * addPages);
+        		ptrToFreeBlock = bestFit(tempHeader,blockSize);
+        	}
+        }
+        else if(freelist_head->next == NULL && freelist_head->prev == NULL)	//no fragements; memory just allocated.
+        {
+        	freelist_head = sf_sbrk(4096 * addPages);
+        	ptrToFreeBlock = freelist_head;
+        }*/
+
 }
 
 void *sf_realloc(void *ptr, size_t size) {
@@ -132,10 +179,28 @@ void sf_free(void* ptr) {
 		errno = EINVAL;
 		return;
 	}
-
+														//only keep block size in header and footer
 	(hptr->alloc) = 0;									//set header alloc bit to 0;
 	(fptr->alloc) = 0;									//set footer alloc bit to 0;
 	(hptr->requested_size) = 0;
+	(hptr->splinter) = 0;
+	(hptr->padding_size) = 0;
+	(hptr->splinter_size)= 0;
+	(fptr->splinter) = 0;
+
+	sf_footer* prevAdjacentBlockFt = (sf_footer*)(char*)hptr - QWSIZE;
+	sf_header* nextAdjacentBlockHd = (sf_header*)(char*)fptr + QWSIZE;
+	void* finalHd = NULL;
+
+	if(prevAdjacentBlockFt->alloc == 0 && nextAdjacentBlockHd->alloc == 1)					//if only prev block is free
+		finalHd = coalesce(prevAdjacentBlockFt,hptr);
+	if(nextAdjacentBlockHd->alloc == 0 && prevAdjacentBlockFt->alloc == 1)					//if only adjacent block is free
+		finalHd = coalesce(nextAdjacentBlockHd,hptr);
+	if(prevAdjacentBlockFt->alloc == 0 && nextAdjacentBlockHd->alloc == 0)					//if both adjacent blocks are free
+	{
+		void* newHd = coalesce(prevAdjacentBlockFt,hptr);
+		finalHd = coalesce(newHd,nextAdjacentBlockHd);
+	}
 
 	if((void*)hptr < (void*)freelist_head)				//if current header address is less than freelist header address
 	{
@@ -161,7 +226,7 @@ void sf_free(void* ptr) {
 		}
 	}
 
-	coalesce(ptr);
+	//coalesce(ptr);
 	return;
 }
 
@@ -169,25 +234,44 @@ int sf_info(info* ptr) {
 	return -1;
 }
 
-void coalesce(void* ptr)
+void coalesce(void* ptr1, void* ptr2)
 {
+
 	return;
 }
 
-sf_free_header* bestFit(sf_free_header* freelist_head,size_t requestedSize)
+sf_free_header* bestFit(sf_free_header* freelist_head,size_t blockSize)
 {
 	sf_free_header* currptr = freelist_head;
 	sf_free_header* smallestSize = NULL;
+	sf_free_header* lastNodeFreeList = NULL;
+
+while(smallestSize == NULL)
+{
 	while(currptr != NULL)
 	{
-		if((currptr->header.block_size)== requestedSize)
+		if(currptr->next == NULL && currptr->prev == NULL)										//only one big chunk of memory
 			return currptr;
-		if(((currptr->header.block_size) > requestedSize) && ((currptr->header.block_size) < (smallestSize->header.block_size)))
+		if((currptr->header.block_size)== blockSize)
+			return currptr;
+		if(((currptr->header.block_size) > blockSize) && (smallestSize == NULL))	//set smallestSize to initial free block that is bigger than blockSize
+			smallestSize = currptr;
+		if(((currptr->header.block_size) > blockSize) &&
+			(currptr->header.block_size) < (smallestSize->header.block_size))		//set smallestSize to freeBlock that is bigger than blockSize but smaller than smallestSize
 			smallestSize = currptr;
 
 		currptr = currptr->next;
+		if(currptr->next == NULL)
+			lastNodeFreeList = currptr;
 	}
 
+	if(smallestSize == NULL)														//freelist doesn't contain big enough size, make more space
+	{
+		void* ptrNewMem = sf_sbrk(4096);
+		pages++;
+		coalesce(lastNodeFreeList,ptrNewMem);										//coalesce the
+	}
+}
 	return smallestSize;
 }
 
