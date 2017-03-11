@@ -58,6 +58,8 @@ int main(int argc, char *argv[]) {
     info("Initialized heap with %dmb of heap space.\n", MAX_HEAP_SIZE >> 20);
     press_to_cont();
 
+   // info* infoptr = (info*)sf_malloc(sizeof(info*));
+
    /* freelist_head = (sf_free_header*)sf_sbrk(4096);
     void* currentAddress = sf_sbrk(0);
     debug("%p\n", freelist_head);
@@ -72,6 +74,14 @@ int main(int argc, char *argv[]) {
     payload_check(value1);
     // Print out the allocator block
     sf_varprint(value1);
+   // sf_info(infoptr);
+    /*debug("Allocated blocks: %zu\n",infoptr->allocatedBlocks);
+    debug("Splintered blocks: %zu\n",infoptr->splinterBlocks);
+    debug("Splintered Amount: %zu\n",infoptr->splintering);
+    debug("Padding done: %zu\n",infoptr->padding);
+    debug("Coalescing : %zu\n", infoptr->coalesces);
+    debug("Peak Memory Util. : %f\n",infoptr->peakMemoryUtilization);*/
+
     press_to_cont();
 
     // Now assign a value
@@ -114,7 +124,10 @@ int main(int argc, char *argv[]) {
     // Allocate more memory
     printf("=== Test7: 8192 byte allocation ===\n");
     void *memory = sf_malloc(8192);
+    //sf_varprint(memory);
     sf_free(memory);
+    sf_snapshot(true);
+   // sf_blockprint((void*)0x607018);
     press_to_cont();
 
     sf_mem_fini();

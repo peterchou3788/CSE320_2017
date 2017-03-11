@@ -67,3 +67,45 @@ Test(sf_memsuite, Coalesce_no_coalescing, .init = sf_mem_init, .fini = sf_mem_fi
 //STUDENT UNIT TESTS SHOULD BE WRITTEN BELOW
 //DO NOT DELETE THESE COMMENTS
 //#
+
+Test(sf_memsuite, sf_info_using, .init = sf_mem_init, .fini = sf_mem_fini)
+{
+    info* infoptr = (info*)sf_malloc(sizeof(info*));
+    int *x = sf_malloc(sizeof(int));
+    memset(x,0,0);
+    //*x = 4;
+    double* y = sf_malloc(sizeof(double));
+    //*y = 6.0;
+    //printf("%f\n",*y);
+    sf_free(y);
+   // printf("%d\n",*x);
+
+    sf_info(infoptr);
+
+    cr_assert((infoptr->allocatedBlocks)= 2, "Allocated Blocks Not 2\n");
+    cr_assert((infoptr->coalesces) = 1, "Coealsce not 1\n");
+    cr_assert((infoptr->padding) = 20, "Padding not 20\n");
+}
+
+Test(sf_memsuite, Malloc_a_char, .init = sf_mem_init, .fini = sf_mem_fini)
+{
+  char* ch = sf_malloc(sizeof(char));
+  *ch = 'd';
+
+  cr_assert(*ch == 'd' ,"Failed To make space for a character");
+}
+
+Test(sf_memsuite,Freeing_Mem, .init = sf_mem_init, .fini = sf_mem_fini)
+{
+  int* integer = sf_malloc(sizeof(int));
+  //*integer = 5;
+
+  sf_free(integer);
+
+  sf_header* header = (sf_header*)((char*)integer - 8);
+  sf_footer* footer = (sf_footer*)((char*)header + (header->block_size<<4) - 8);
+  cr_assert((header->alloc) == 0, "Header alloc not 0\n");
+  cr_assert((footer->alloc) == 0, "Footer alloc not 0\n");
+}
+
+
