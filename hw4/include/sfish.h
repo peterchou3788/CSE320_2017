@@ -9,7 +9,10 @@
 #include <limits.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <boolean.h>
+#include <sys/stat.h>
+#include <error.h>
+#include <errno.h>
+#include <debug.h>
 
 #define BUFFERSIZE 128
 #define DELIM " \t\n\r"
@@ -31,7 +34,10 @@
 }while(0)
 
 char** parsing(char *str);
-void validateCmd(char* cmd,char** stringArray,char** cwd,char** oldDir);
+void validateCmd(char* cmd,char** stringArray,char** cwd,char** oldDir,char* pathV);
+char** parsingPathVar(char* path);
+char** parsingDirectory(char* path);
+const char* getexePath(char** tokens,char* cmd);
 
 
 #endif
