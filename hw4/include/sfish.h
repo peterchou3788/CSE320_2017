@@ -6,6 +6,10 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <limits.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <boolean.h>
 
 #define BUFFERSIZE 128
 #define DELIM " \t\n\r"
@@ -27,7 +31,7 @@
 }while(0)
 
 char** parsing(char *str);
-void validateCmd(char* cmd,char** stringArray,char* pwd);
+void validateCmd(char* cmd,char** stringArray,char** cwd,char** oldDir);
 
 
 #endif
