@@ -1,5 +1,7 @@
 #include "sfish.h"
 
+volatile sig_atomic_t alarmflag = false;
+
 char** parsing(char* str)
 {
 
@@ -279,6 +281,7 @@ void validateCmd(char* cmd, char** stringArray,char** cwd,char** oldDir,char* pa
 			if(child == 0)					//child process
 			{
 				printf("%s\n",*cwd);
+				for(int i = 0; i < 100000000; i++);
 				exit(0);
 			}
 			else							//parent process
@@ -299,6 +302,32 @@ void validateCmd(char* cmd, char** stringArray,char** cwd,char** oldDir,char* pa
 		exit(EXIT_SUCCESS);
 	}
 
+	if(strcmp(cmd,"alarm") == 0)
+	{
+		char *argument = *(tempArray+1);
+
+		if(argument == NULL)
+		{
+			fprintf(stderr,"Invalid argument: alarm requires a number\n");
+			return;
+		}
+
+		char numc = *argument;
+		int numi = atoi(argument);
+		if(numc <= '0' || numc >= '9')
+		{
+			fprintf(stderr,"Invalid argument: alarm requires a number\n");
+			return;
+		}
+
+		else
+		{
+			alarmcmd(numi);
+		}
+		return;
+
+	}
+
 	if(strcmp(cmd,"ls") == 0 || strcmp(cmd,"grep")== 0 || strcmp(cmd,"cat") == 0)
 	{
 		pid_t pid;
@@ -311,6 +340,7 @@ void validateCmd(char* cmd, char** stringArray,char** cwd,char** oldDir,char* pa
 			const char* AbsPath = getexePath(pathTokens,cmd);
 
 			debug("%s\n",AbsPath);
+			for(int i = 0; i < 100000000; i++);
 			if(execv(AbsPath,stringArray) == -1)
 			{
 				//debug("%s\n",hello);
@@ -318,6 +348,7 @@ void validateCmd(char* cmd, char** stringArray,char** cwd,char** oldDir,char* pa
 				free(pathTokens);
 				return;
 			}
+
 			free(pathTokens);
 		}
 		else
@@ -368,6 +399,29 @@ const char* getexePath(char** pathvariables,char* cmd)
 	return NULL;
 }
 
+void alarmcmd(int time)
+{
+	int timeDone = 0;
+	signal(SIGALRM,alarmhandler);
+
+	timeDone = alarm(time);
+	sleep(time);
+
+	info("Your alarm finished with %i seconds\n",timeDone);
+
+	if(alarmflag == true)
+	{
+		printf("Your %i second timer has finished!\n",time);
+		alarmflag = false;
+	}
+	return;
+
+}
+
+void alarmhandler(int sign)
+{
+	alarmflag = true;
+}
 
 
 

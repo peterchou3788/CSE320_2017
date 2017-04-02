@@ -13,9 +13,12 @@
 #include <error.h>
 #include <errno.h>
 #include <debug.h>
+#include <stdbool.h>
+#include "csapp.h"
 
 #define BUFFERSIZE 128
 #define DELIM " \t\n\r"
+
 
 
 #define USAGE(return_code) do{                                                                                                   \
@@ -38,6 +41,8 @@ void validateCmd(char* cmd,char** stringArray,char** cwd,char** oldDir,char* pat
 char** parsingPathVar(char* path);
 char** parsingDirectory(char* path);
 const char* getexePath(char** tokens,char* cmd);
+void alarmhandler(int sign);
+void alarmcmd(int time);
 
 
 #endif

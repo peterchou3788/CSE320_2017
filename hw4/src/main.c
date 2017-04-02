@@ -1,9 +1,51 @@
 #include "sfish.h"
 #include "debug.h"
 
+volatile sig_atomic_t typeflag = true;
+volatile sig_atomic_t userflag = false;
+volatile sig_atomic_t childpid = 0;
+volatile sig_atomic_t childtime = 0;
+
+
 /*
  * As in previous hws the main function must be in its own file!
  */
+void block_handler(int sig)
+{
+    sigset_t mask_all;
+    sigset_t prev_all;
+    Sigfillset(&mask_all);
+
+    Sigprocmask(SIG_BLOCK,&mask_all,&prev_all);
+    //typeflag = true;
+}
+
+void user2_handler(int sig)
+{
+
+    if(sig == SIGUSR2)
+    {
+        Sio_puts("\nWell that was easy\n");
+    }
+    //userflag = true;
+
+}
+
+void child_handler(int sig,siginfo_t * siginfo,void* something)
+{
+    //childflag = true;
+    Sio_puts("\nChild with PID ");
+    Sio_putl((long)siginfo->si_pid);
+    Sio_puts(" has died. ");
+
+    float a = siginfo->si_utime;
+    float b = siginfo->si_stime;
+    float CPUtime = (a+b)/(sysconf(_SC_CLK_TCK)/1000.0);
+    Sio_puts("It spent ");
+    Sio_putl(CPUtime);
+    Sio_puts(" milliseconds utilizing the CPU.\n");
+
+}
 
 int main(int argc, char const *argv[], char* envp[]){
     /* DO NOT MODIFY THIS. If you do you will get a ZERO. */
@@ -12,6 +54,7 @@ int main(int argc, char const *argv[], char* envp[]){
     char *cmd = "";
     char *pwd = getenv("PWD");
     char** stringArray = NULL;
+    pid_t pidShell;
   //  char* homeEnv = getenv("HOME");
   //  char* logName = getenv("LOGNAME");
     char* path = getenv("PATH");
@@ -39,13 +82,28 @@ int main(int argc, char const *argv[], char* envp[]){
 
      struct stat *buff = (struct stat*)malloc(sizeof(struct stat));
 
+    signal(SIGTSTP,block_handler);          //ctrl z signal
+    signal(SIGUSR2,user2_handler);          //user signal
+
+
+    //child signal
+    struct sigaction newaction;
+
+    newaction.sa_sigaction = &child_handler;
+    newaction.sa_flags = SA_SIGINFO;
+
+    if(sigaction(SIGCHLD,&newaction,NULL) < 0)
+        unix_error("Signal error");
+    //signal(SIGCHLD,child_handler);
     //getcwd()
    // pwd = "/SampleDir $";
     while(1)
     {
+        pidShell = getpid();
         pwd = getenv("PWD");
         debug("oldPWD : %s\n",*oldDir);
         debug("PWD : %s\n",pwd);
+        debug("PID : %d\n",pidShell);
        // if (strcmp(cmd, "exit")==0)
         //    break;
         fprintf(stdout,"pechou : ");
