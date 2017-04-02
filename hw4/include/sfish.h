@@ -9,10 +9,16 @@
 #include <limits.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <boolean.h>
+#include <sys/stat.h>
+#include <error.h>
+#include <errno.h>
+#include <debug.h>
+#include <stdbool.h>
+#include "csapp.h"
 
 #define BUFFERSIZE 128
 #define DELIM " \t\n\r"
+
 
 
 #define USAGE(return_code) do{                                                                                                   \
@@ -31,7 +37,12 @@
 }while(0)
 
 char** parsing(char *str);
-void validateCmd(char* cmd,char** stringArray,char** cwd,char** oldDir);
+void validateCmd(char* cmd,char** stringArray,char** cwd,char** oldDir,char* pathV);
+char** parsingPathVar(char* path);
+char** parsingDirectory(char* path);
+const char* getexePath(char** tokens,char* cmd);
+void alarmhandler(int sign);
+void alarmcmd(int time);
 
 
 #endif
