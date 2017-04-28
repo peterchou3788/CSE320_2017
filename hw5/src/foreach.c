@@ -2,14 +2,31 @@
 #include "arraylist.h"
 #include "foreach.h"
 
-void *foreach_init(void *self){
-    void *ret = NULL;
 
-    return ret;
+void *foreach_init(arraylist_t *self){
+
+    if(self == NULL || self->base == NULL)
+        return NULL;
+
+    void* beginning = get_index_al(self,0);
+
+    return beginning;
 }
 
-void *foreach_next(void *self, void* data){
+void *foreach_next(arraylist_t *self, void* data){
     void *ret = NULL;
+
+    if(data == NULL)
+        return data;
+
+    size_t index = get_data_al(self,data);
+
+    if(index == UINT_MAX)
+        return NULL;
+
+
+
+
 
     return ret;
 }
@@ -26,8 +43,8 @@ bool foreach_break_f(){
     return ret;
 }
 
-int32_t apply(void *self, int32_t (*application)(void*)){
-    int32_t ret = 0;
+int apply(arraylist_t *self, int (*application)(void*)){
+    int ret = 0;
 
     return ret;
 }

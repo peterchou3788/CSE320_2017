@@ -5,6 +5,9 @@
 #include <limits.h>
 #include <stdbool.h>
 #include "const.h"
+#include <string.h>
+#include <semaphore.h>
+#include "csapp.h"
 
 /*
     _  _____ _____ _   _     ____  _     _____    ____  _____    _    ____
@@ -21,6 +24,7 @@ typedef struct{
     size_t item_size;
     void* base;
     /* END: .. add locks, other fields BELOW THIS COMMENT if needed .. */
+    sem_t mutex;
 
 }arraylist_t;
 
