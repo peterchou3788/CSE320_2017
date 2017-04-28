@@ -137,7 +137,7 @@ void *get_index_al(arraylist_t *self, size_t index){
         errno = EINVAL;
         return NULL;
     }
-    void* data = NULL;
+    char* data = (char*)malloc(self->item_size);
     P(&self->mutex);
     if(index >= self->length)
     {
@@ -218,7 +218,7 @@ bool remove_data_al(arraylist_t *self, void *data){
 void *remove_index_al(arraylist_t *self, size_t index){
 
     char* address = NULL;
-    void* tempAddress = NULL;
+    char* tempAddress = (char*)malloc(self->item_size);
     P(&self->mutex);
     if(index >= self->length)
     {
@@ -244,9 +244,9 @@ void *remove_index_al(arraylist_t *self, size_t index){
     P(&self->mutex);
     for(int i = index; i< self->length;i++)
     {
-        char* address = (char*)self->base + self->item_size * i;
+        char* address1 = (char*)self->base + self->item_size * i;
         char* address2 = (char*)self->base + self->item_size * (i+1);
-        memmove(address,address2,self->item_size);
+        memmove(address1,address2,self->item_size);
     }
     self->length = self->length-1;
     if(self->length <= (self->capacity/2)-1)
